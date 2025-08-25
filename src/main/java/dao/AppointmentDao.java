@@ -10,5 +10,8 @@ public interface AppointmentDao {
   void save(Appointment appt);
   List<Appointment> findByEmployeeAndDate(Long employeeId, Date date);
   boolean existsOverlap(Long employeeId, Date date, Time start, Time end);
+  List<Appointment> findByDateRange(LocalDate startDate, LocalDate endDate);
+  List<Object[]> countAppointmentsByService();
+  Long countAllBookings();
 }
 

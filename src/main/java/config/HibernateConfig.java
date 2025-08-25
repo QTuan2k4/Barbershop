@@ -1,7 +1,9 @@
 package config;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Environment;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
-import java.util.Properties;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @EnableTransactionManagement
@@ -30,9 +32,9 @@ public class HibernateConfig {
     public DataSource dataSource() {
         HikariConfig cfg = new HikariConfig();
         cfg.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        cfg.setJdbcUrl("jdbc:mysql://localhost:3307/barbershop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh");
+        cfg.setJdbcUrl("jdbc:mysql://localhost:3306/barbershop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh");
         cfg.setUsername("root");
-        cfg.setPassword(""); // đổi mật khẩu
+        cfg.setPassword("nhunguy@123"); // đổi mật khẩu
         cfg.setMaximumPoolSize(10);
         cfg.setPoolName("HikariDemoPool");
         return new HikariDataSource(cfg);

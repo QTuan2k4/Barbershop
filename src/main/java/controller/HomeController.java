@@ -20,4 +20,9 @@ public class HomeController {
 
         return "home"; // /WEB-INF/views/home.jsp
     }
+
+//    @GetMapping("/")
+//    public String home() {
+//        return "home"; // Trả về trang home.jsp
+//    }
 }
