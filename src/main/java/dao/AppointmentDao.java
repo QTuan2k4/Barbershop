@@ -10,5 +10,10 @@ public interface AppointmentDao {
   void save(Appointment appt);
   List<Appointment> findByEmployeeAndDate(Long employeeId, Date date);
   boolean existsOverlap(Long employeeId, Date date, Time start, Time end);
+
+//Chức năng mới
+ Appointment findById(Long appointmentId);
+ List<Appointment> findByUserId(Long userId);
+ void update(Appointment appointment);
 }
 

@@ -1,9 +1,11 @@
 package controller;
 
 import entity.Appointment;
+import entity.AppointmentStatus;
 import entity.Employee;
 import entity.ServiceEntity;
 import service.AppointmentService;
+import service.ReviewService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,12 +26,14 @@ import java.util.List;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final ReviewService reviewService;
 
     @PersistenceContext
     private EntityManager em;
 
-    public AppointmentController(AppointmentService appointmentService) {
+    public AppointmentController(AppointmentService appointmentService, ReviewService reviewService) {
         this.appointmentService = appointmentService;
+        this.reviewService = reviewService;
     }
     
     /** Helper: nạp danh sách dịch vụ & nhân viên cho form */
@@ -110,5 +114,68 @@ public class AppointmentController {
     @GetMapping("/success")
     public String success() {
         return "appointmentSuccess";
+    }
+
+    // Chức năng xem lịch đã đặt
+    @GetMapping("/my-appointments")
+    public String myAppointments(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        
+        List<Appointment> appointments = appointmentService.getUserAppointments(userId);
+        model.addAttribute("appointments", appointments);
+        return "myAppointments";
+    }
+
+    // Chức năng hủy lịch
+    @PostMapping("/{appointmentId}/cancel")
+    public String cancelAppointment(@PathVariable Long appointmentId,
+                                   @RequestParam String reason,
+                                   HttpSession session,
+                                   RedirectAttributes ra) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) {
+                ra.addFlashAttribute("err", "Bạn cần đăng nhập");
+                return "redirect:/login";
+            }
+            
+            appointmentService.cancelAppointment(appointmentId, userId, reason);
+            ra.addFlashAttribute("msg", "Đã hủy lịch hẹn thành công");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("err", ex.getMessage());
+        }
+        
+        return "redirect:/appointments/my-appointments";
+    }
+
+    // Chức năng hoàn thành lịch hẹn (cho admin)
+    @PostMapping("/{appointmentId}/complete")
+    public String completeAppointment(@PathVariable Long appointmentId,
+                                     HttpSession session,
+                                     RedirectAttributes ra) {
+        try {
+            Long userId = (Long) session.getAttribute("userId");
+            if (userId == null) {
+                ra.addFlashAttribute("err", "Bạn cần đăng nhập");
+                return "redirect:/login";
+            }
+            
+            // Kiểm tra quyền admin
+            String role = (String) session.getAttribute("role");
+            if (!"ADMIN".equals(role)) {
+                ra.addFlashAttribute("err", "Bạn không có quyền thực hiện chức năng này");
+                return "redirect:/appointments/my-appointments";
+            }
+            
+            appointmentService.completeAppointment(appointmentId);
+            ra.addFlashAttribute("msg", "Đã hoàn thành lịch hẹn");
+        } catch (Exception ex) {
+            ra.addFlashAttribute("err", ex.getMessage());
+        }
+        
+        return "redirect:/admin/appointments";
     }
 }

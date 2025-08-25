@@ -2,6 +2,7 @@ package service;
 
 import dao.AppointmentDao;
 import entity.Appointment;
+import entity.AppointmentStatus;
 import entity.Employee;
 import entity.ServiceEntity;
 import entity.User;
@@ -87,8 +88,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         // a.setStartTime(startTime);
         // a.setEndTime(endTime);
 
-        // Nếu status là String:
-        a.setStatus("BOOKED");
+        // Set status
+        a.setStatus(AppointmentStatus.BOOKED);
 
         // Nếu status là enum top-level: entity.AppointmentStatus
         // a.setStatus(entity.AppointmentStatus.BOOKED);
@@ -101,4 +102,51 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         return a;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Appointment> getUserAppointments(Long userId) {
+        return dao.findByUserId(userId);
+    }
+
+    @Override
+    @Transactional
+    public Appointment cancelAppointment(Long appointmentId, Long userId, String reason) {
+        Appointment appointment = dao.findById(appointmentId);
+        if (appointment == null) {
+            throw new IllegalArgumentException("Lịch hẹn không tồn tại");
+        }
+        
+        if (!appointment.getUser().getUserId().equals(userId)) {
+            throw new IllegalStateException("Bạn không có quyền hủy lịch hẹn này");
+        }
+        
+        if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+            throw new IllegalStateException("Chỉ có thể hủy lịch hẹn đã đặt");
+        }
+        
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+        appointment.setNote(reason);
+        
+        dao.update(appointment);
+        return appointment;
+    }
+
+    @Override
+    @Transactional
+    public Appointment completeAppointment(Long appointmentId) {
+        Appointment appointment = dao.findById(appointmentId);
+        if (appointment == null) {
+            throw new IllegalArgumentException("Lịch hẹn không tồn tại");
+        }
+        
+        if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+            throw new IllegalStateException("Chỉ có thể hoàn thành lịch hẹn đã đặt");
+        }
+        
+        appointment.setStatus(AppointmentStatus.COMPLETED);
+        dao.update(appointment);
+        return appointment;
+    }
 }
+

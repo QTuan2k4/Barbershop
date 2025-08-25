@@ -99,4 +99,29 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
         return cnt != null && cnt > 0;
     }
+
+    @Override
+    public Appointment findById(Long appointmentId) {
+        return em.find(Appointment.class, appointmentId);
+    }
+
+    @Override
+    public List<Appointment> findByUserId(Long userId) {
+        String jpql = "select a from Appointment a " +
+                     "join fetch a.employee e " +
+                     "join fetch a.service sv " +
+                     "where a.user.userId = :userId " +
+                     "order by a.appointmentDate desc, a.startTime desc";
+        
+        return em.createQuery(jpql, Appointment.class)
+                 .setParameter("userId", userId)
+                 .getResultList();
+    }
+
+    @Override
+    @Transactional
+    public void update(Appointment appointment) {
+        em.merge(appointment);
+    }
 }
+

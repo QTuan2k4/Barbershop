@@ -132,6 +132,7 @@
       <nav class="nav">
         <a href="${pageContext.request.contextPath}/">Trang chủ</a>
         <a href="${pageContext.request.contextPath}/appointments/new">Đặt lịch</a>
+        <a href="${pageContext.request.contextPath}/appointments/my-appointments">Lịch hẹn của tôi</a>
         <a href="${pageContext.request.contextPath}/price">Bảng giá</a>
         <a href="${pageContext.request.contextPath}/products">Sản phẩm</a>
         <a href="${pageContext.request.contextPath}/salons">Tìm chi nhánh</a>

@@ -65,6 +65,15 @@
       <button class="btn" type="submit">Đổi mật khẩu</button>
     </form>
   </div>
+
+  <!-- Quản lý lịch hẹn -->
+  <div class="card">
+    <h3>Quản lý lịch hẹn</h3>
+    <p>Xem và quản lý tất cả lịch hẹn của bạn</p>
+    <a href="${pageContext.request.contextPath}/appointments/my-appointments" class="btn" style="text-decoration: none; display: inline-block;">
+      <i class="fas fa-calendar-check"></i> Xem lịch hẹn
+    </a>
+  </div>
 </div>
 </body>
 </html>
