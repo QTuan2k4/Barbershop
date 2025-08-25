@@ -13,8 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;
-import java.sql.Date;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -43,69 +41,66 @@ public class AppointmentController {
     /** Trang đặt lịch + hiển thị giờ đã đặt theo NGÀY (toàn shop) */
     @GetMapping("/new")
     public String form(@RequestParam(value = "date", required = false) String dateStr, Model model) {
-        // 1) Load list cho form
         loadLists(model);
-
-        // 2) Ngày cần xem giờ đã đặt -> LocalDate
-        LocalDate ld = (dateStr == null || dateStr.isBlank())
-                ? LocalDate.now()
-                : LocalDate.parse(dateStr);
+        LocalDate ld = (dateStr == null || dateStr.isBlank()) ? LocalDate.now() : LocalDate.parse(dateStr);
         model.addAttribute("selectedDate", ld.toString());
 
-        // 3) Lấy các khoảng giờ đã đặt (BOOKED/COMPLETED) trong ngày (toàn shop)
-        //    LƯU Ý: setParameter bằng LocalDate để khớp với entity dùng LocalDate
         List<Appointment> booked = em.createQuery(
-                "from Appointment a " +
-                "where a.appointmentDate = :d " +
-                "and a.status in ('BOOKED','COMPLETED') " +
-                "order by a.startTime", Appointment.class)
-            .setParameter("d", ld)
-            .getResultList();
+            "from Appointment a where a.appointmentDate = :d and a.status in ('BOOKED','COMPLETED') order by a.startTime",
+            Appointment.class
+        ).setParameter("d", ld).getResultList();
 
         model.addAttribute("booked", booked);
         return "bookAppointment";
     }
 
     @PostMapping
-    public String create(@RequestParam("serviceIds") List<Long> serviceIds,  // nhận nhiều dịch vụ
+    public String create(@RequestParam("serviceIds") java.util.List<Long> serviceIds,
                          @RequestParam("employeeId") Long employeeId,
-                         @RequestParam("date") String dateStr,               // yyyy-MM-dd
-                         @RequestParam("startTime") String timeStr,          // HH:mm hoặc HH:mm:ss
-                         HttpSession session, RedirectAttributes ra, Model model) {
+                         @RequestParam("date") String dateStr,
+                         @RequestParam("startTime") String timeStr,
+                         HttpSession session,
+                         RedirectAttributes ra, Model model) {
         try {
             Long userId = (Long) session.getAttribute("userId");
             if (userId == null) {
                 ra.addFlashAttribute("err", "Bạn cần đăng nhập");
                 return "redirect:/login";
             }
-
             if (serviceIds == null || serviceIds.isEmpty()) {
                 model.addAttribute("err", "Vui lòng chọn ít nhất 1 dịch vụ");
                 loadLists(model);
                 return "bookAppointment";
             }
 
-            // Controller vẫn dùng sql.Date/Time để gọi xuống service (service sẽ tự convert sang LocalDate/LocalTime)
-            Date date = Date.valueOf(dateStr);
-            Time currentStart = Time.valueOf(timeStr.length() == 5 ? timeStr + ":00" : timeStr);
+            java.time.LocalDate date = java.time.LocalDate.parse(dateStr);
+            java.time.LocalTime cursor = java.time.LocalTime.parse(timeStr); // khởi điểm
 
-            // Đặt lần lượt: dịch vụ sau bắt đầu ngay khi dịch vụ trước kết thúc
-            for (Long serviceId : serviceIds) {
-                appointmentService.book(userId, serviceId, employeeId, date, currentStart);
-
-                // Tăng 30 phút cho slot kế tiếp (khớp với logic trong service)
-                LocalTime next = currentStart.toLocalTime().plusMinutes(30);
-                currentStart = Time.valueOf(next);
+            // Đặt lần lượt các dịch vụ
+            for (Long sid : serviceIds) {
+                // dùng Service để lấy duration từ DB để cộng giờ tiếp theo
+                entity.ServiceEntity svc = em.find(entity.ServiceEntity.class, sid);
+                if (svc == null || svc.getDuration() == null || svc.getDuration() <= 0) {
+                    throw new IllegalArgumentException("Dịch vụ không hợp lệ hoặc thiếu thời lượng");
+                }
+                // Book cho dịch vụ hiện tại tại thời điểm 'cursor'
+                appointmentService.book(userId, sid, employeeId, date, cursor);
+                // Dời 'cursor' sang sau dịch vụ hiện tại
+                cursor = cursor.plusMinutes(svc.getDuration());
             }
 
-            ra.addFlashAttribute("msg", "Đặt lịch thành công " + serviceIds.size() + " dịch vụ liên tiếp!");
+            ra.addFlashAttribute("msg", "Đặt lịch thành công!");
             return "redirect:/appointments/success";
+
         } catch (Exception ex) {
             model.addAttribute("err", ex.getMessage());
             loadLists(model);
             return "bookAppointment";
         }
     }
+
+
+
 
     @GetMapping("/success")
     public String success() {
