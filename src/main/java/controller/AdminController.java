@@ -24,6 +24,12 @@ public class AdminController {
     this.appointmentService = appointmentService;
   }
 
+//    @GetMapping
+//    public String adminHome() {
+//        return "admin"; // Trả về file admin.jsp
+//    }
+//
+
   // ===== Dashboard (tuỳ chọn) =====
   @GetMapping
   public String adminHome() { return "admin/index"; }
