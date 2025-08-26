@@ -83,9 +83,18 @@ public class ServiceController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteService(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        serviceService.deleteService(id);
-        redirectAttributes.addFlashAttribute("message", "Xóa dịch vụ thành công!");
+    public String deleteService(@PathVariable("id") Long id,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            serviceService.deleteService(id);
+            redirectAttributes.addFlashAttribute("message", "Xóa dịch vụ thành công!");
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("error",
+                "❌ Ko thể xóa dịch vụ này vì đang có lịch hẹn của dịch vụ này rồi!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error",
+                "❌ Đã xảy ra lỗi khi xóa dịch vụ!");
+        }
         return "redirect:/admin/services";
     }
 }
