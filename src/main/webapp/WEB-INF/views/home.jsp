@@ -162,7 +162,7 @@
         </div>
 
         <div class="hero-card">
-          <img src="${pageContext.request.contextPath}/resources/images/service-cut.jpg" alt="Cắt tóc" style="width:72px; border-radius:12px">
+          <img src="${pageContext.request.contextPath}/resources/images/cattoc.jpg" alt="Cắt tóc" style="width:72px; border-radius:12px">
           <div style="text-align:left">
             <div style="font-weight:800">Cắt tóc</div>
             <div class="hero-price"><span class="num">90.000</span><span> VNĐ</span></div>

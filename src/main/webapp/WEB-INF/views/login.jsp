@@ -3,7 +3,8 @@
 <html>
 <head>
 <title>Đăng nhập</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/login.css">
+<link rel="stylesheet" href="<c:url value='/resources/css/login.css'/>">
+
 </head>
 <body>
 <h2>Đăng nhập</h2>
