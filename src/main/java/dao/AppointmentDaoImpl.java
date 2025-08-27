@@ -3,30 +3,24 @@ package dao;
 import entity.Appointment;
 
 import org.springframework.stereotype.Repository;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
+@Transactional
 public class AppointmentDaoImpl implements AppointmentDao {
-
-    private final SessionFactory sessionFactory;
 
     @PersistenceContext
     private EntityManager em;
 
-    // CREATE / UPDATE
+    /* ===================== CREATE / UPDATE ===================== */
     @Override
-    @Transactional
     public void save(Appointment appt) {
         if (appt.getAppointmentId() == null) {
             em.persist(appt);
@@ -35,11 +29,11 @@ public class AppointmentDaoImpl implements AppointmentDao {
         }
     }
 
-    // LIST + optional filters
+    /* ============== LIST (JOIN FETCH + optional filters) =============== */
     @Override
     public List<Appointment> findAllWithJoins(String status, Long employeeId, LocalDate date) {
         StringBuilder jpql = new StringBuilder(
-            "select a from Appointment a " +
+            "select distinct a from Appointment a " +              // distinct tránh duplicate do join fetch
             "join fetch a.user u " +
             "join fetch a.employee e " +
             "join fetch a.service sv " +
@@ -52,21 +46,16 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
         var q = em.createQuery(jpql.toString(), Appointment.class);
 
-        if (status != null && !status.isBlank()) {
-            q.setParameter("st", status); // status là String
-        }
-        if (employeeId != null) {
-            q.setParameter("eid", employeeId);
-        }
-        if (date != null) {
-            q.setParameter("d", date); // LocalDate
-        }
+        if (status != null && !status.isBlank()) q.setParameter("st", status);
+        if (employeeId != null)                  q.setParameter("eid", employeeId);
+        if (date != null)                        q.setParameter("d", date);
+
         return q.getResultList();
     }
 
-    // FIND by employee + date (BOOKED/COMPLETED)
+    /* ======= FIND by employee + date (BOOKED/COMPLETED) ======= */
     @Override
-    public List<Appointment> findByEmployeeAndDate(Long employeeId, Date date) {
+    public List<Appointment> findByEmployeeAndDate(Long employeeId, LocalDate date) {
         String jpql =
             "select a from Appointment a " +
             "where a.employee.employeeId = :empId " +
@@ -74,17 +63,15 @@ public class AppointmentDaoImpl implements AppointmentDao {
             "and a.status in ('BOOKED','COMPLETED') " +
             "order by a.startTime";
 
-        LocalDate ld = date.toLocalDate(); // convert sql.Date -> LocalDate
-
         return em.createQuery(jpql, Appointment.class)
                  .setParameter("empId", employeeId)
-                 .setParameter("d", ld)  // LocalDate
+                 .setParameter("d", date)
                  .getResultList();
     }
 
-    // CHECK overlap (BOOKED/COMPLETED)
+    /* ============== CHECK overlap (BOOKED/COMPLETED) ============== */
     @Override
-    public boolean existsOverlap(Long employeeId, Date date, Time start, Time end) {
+    public boolean existsOverlap(Long employeeId, LocalDate date, LocalTime start, LocalTime end) {
         String jpql =
             "select count(a) from Appointment a " +
             "where a.employee.employeeId = :empId " +
@@ -92,45 +79,41 @@ public class AppointmentDaoImpl implements AppointmentDao {
             "and a.status in ('BOOKED','COMPLETED') " +
             "and (:start < a.endTime and :end > a.startTime)";
 
-        LocalDate ld = date.toLocalDate();
-
         Long cnt = em.createQuery(jpql, Long.class)
                      .setParameter("empId", employeeId)
-                     .setParameter("d", ld) // LocalDate
-                     .setParameter("start", start.toLocalTime()) // convert Time -> LocalTime
-                     .setParameter("end", end.toLocalTime())     // convert Time -> LocalTime
+                     .setParameter("d", date)
+                     .setParameter("start", start)
+                     .setParameter("end", end)
                      .getSingleResult();
 
         return cnt != null && cnt > 0;
     }
 
-    public AppointmentDaoImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
-    private Session s() {
-        return sessionFactory.getCurrentSession();
-    }
+    /* ===================== REPORTING/APIs bổ sung ===================== */
 
     @Override
     public List<Appointment> findByDateRange(LocalDate startDate, LocalDate endDate) {
-        Query<Appointment> query = s().createQuery("from Appointment where appointmentDate between :start and :end", Appointment.class);
-        query.setParameter("start", startDate);
-        query.setParameter("end", endDate);
-        return query.getResultList();
+        String jpql = "from Appointment a where a.appointmentDate between :start and :end order by a.appointmentDate, a.startTime";
+        return em.createQuery(jpql, Appointment.class)
+                 .setParameter("start", startDate)
+                 .setParameter("end", endDate)
+                 .getResultList();
     }
 
     @Override
     public List<Object[]> countAppointmentsByService() {
-        // Sử dụng HQL để JOIN và GROUP BY
-        Query<Object[]> query = s().createQuery(
-                "select s.name, count(a.appointmentId) from Appointment a join a.service s group by s.name", Object[].class);
-        return query.getResultList();
+        // Trả về: [serviceName, count]
+        String jpql = "select s.name, count(a.appointmentId) " +
+                      "from Appointment a join a.service s " +
+                      "group by s.name " +
+                      "order by count(a.appointmentId) desc";
+        return em.createQuery(jpql, Object[].class)
+                 .getResultList();
     }
 
     @Override
     public Long countAllBookings() {
-        return s().createQuery("select count(a.appointmentId) from Appointment a", Long.class)
-                .uniqueResult();
+        String jpql = "select count(a.appointmentId) from Appointment a";
+        return em.createQuery(jpql, Long.class).getSingleResult();
     }
 }

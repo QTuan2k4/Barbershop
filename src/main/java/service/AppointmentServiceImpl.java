@@ -52,7 +52,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalArgumentException("User/Employee/Service không tồn tại");
         }
 
-        // 2) Tính endTime: cố định 30 phút
+        // 2) Tính endTime: cố định 30 phút (dùng java.time)
         LocalTime startLt = startTime.toLocalTime();
         LocalTime endLt   = startLt.plusMinutes(DURATION_MIN);
         if (!startLt.isBefore(endLt)) {
@@ -64,39 +64,27 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalArgumentException("Ngoài giờ mở cửa (08:00–21:00)");
         }
 
-        Time endTime = Time.valueOf(endLt);
-
-        // 4) Chống chồng lịch (BOOKED/COMPLETED)
-        if (dao.existsOverlap(emp.getEmployeeId(), date, startTime, endTime)) {
+        // 4) Chống chồng lịch (BOOKED/COMPLETED) -> dùng chữ ký mới của DAO (java.time)
+        LocalDate apptDate = date.toLocalDate();
+        boolean overlap = dao.existsOverlap(emp.getEmployeeId(), apptDate, startLt, endLt);
+        if (overlap) {
             throw new IllegalStateException("Khung giờ đã được đặt. Vui lòng chọn giờ khác");
         }
 
-        // 5) Lưu — CHÚ Ý: chuyển sang LocalDate/LocalTime nếu entity dùng kiểu này
+        // 5) Lưu — entity Appointment dùng LocalDate/LocalTime
         Appointment a = new Appointment();
         a.setUser(user);
         a.setEmployee(emp);
         a.setService(svc);
-
-        // Nếu Appointment dùng LocalDate/LocalTime:
-        a.setAppointmentDate(date.toLocalDate());
+        a.setAppointmentDate(apptDate);
         a.setStartTime(startLt);
         a.setEndTime(endLt);
-
-        // Nếu Appointment dùng java.sql.Date/Time, đổi 3 dòng trên thành:
-        // a.setAppointmentDate(date);
-        // a.setStartTime(startTime);
-        // a.setEndTime(endTime);
-
-        // Nếu status là String:
-        a.setStatus("BOOKED");
-
-        // Nếu status là enum top-level: entity.AppointmentStatus
-        // a.setStatus(entity.AppointmentStatus.BOOKED);
+        a.setStatus("BOOKED"); // hoặc enum nếu bạn dùng enum
 
         try {
             dao.save(a);
         } catch (DataIntegrityViolationException e) {
-            // phòng race-condition: unique index bắn khi vừa bị người khác đặt
+            // Phòng race-condition (unique/constraint nổ khi vừa bị người khác đặt)
             throw new IllegalStateException("Slot vừa hết. Vui lòng thử lại");
         }
         return a;
