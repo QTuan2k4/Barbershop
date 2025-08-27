@@ -66,7 +66,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
     // FIND by employee + date (BOOKED/COMPLETED)
     @Override
-    public List<Appointment> findByEmployeeAndDate(Long employeeId, Date date) {
+    public List<Appointment> findByEmployeeAndDateN(Long employeeId, Date date) {
         String jpql =
             "select a from Appointment a " +
             "where a.employee.employeeId = :empId " +
