@@ -10,6 +10,7 @@
     <option value="BOOKED"     ${status=='BOOKED'?'selected':''}>BOOKED</option>
     <option value="CANCELLED"  ${status=='CANCELLED'?'selected':''}>CANCELLED</option>
     <option value="COMPLETED"  ${status=='COMPLETED'?'selected':''}>COMPLETED</option>
+    <option value="CONFIRMED"  ${status=='CONFIRMED'?'selected':''}>CONFIRMED</option>
   </select>
   &nbsp;Nhân viên:
   <select name="employeeId">
@@ -40,6 +41,52 @@
       <td>${a.startTime}</td>
       <td>${a.endTime}</td>
       <td>${a.status}</td>
+      <td>
+      <!-- Nút Xác nhận: chỉ hiện khi status đang BOOKED -->
+      <c:if test="${a.status == 'BOOKED'}">
+        <form method="post"
+              action="${pageContext.request.contextPath}/admin/appointments/${a.appointmentId}/confirm"
+              style="display:inline">
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+          <button type="submit">Xác nhận</button>
+        </form>
+      </c:if>
+	  
+		   <!-- Nút Hoàn thành: chỉ khi CONFIRMED -->
+	  <c:if test="${a.status == 'CONFIRMED'}">
+	    <form method="post"
+	          action="${pageContext.request.contextPath}/admin/appointments/${a.appointmentId}/complete"
+	          style="display:inline">
+	      <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	      <button type="submit">Hoàn thành</button>
+	    </form>
+	  </c:if>
+		  
+      <!-- Nút Hủy: chỉ hiện khi chưa COMPLETED hoặc CANCELLED -->
+      <c:if test="${a.status != 'COMPLETED' && a.status != 'CANCELLED'}">
+		<form method="post"
+		      action="${pageContext.request.contextPath}/admin/appointments/${a.appointmentId}/cancel"
+		      style="display:inline"
+		      onsubmit="return enterReason(this, ${a.appointmentId});">
+		  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+		  <input type="hidden" name="reason" value=""/>
+		  <button type="submit" style="color:red">Hủy</button>
+		</form>
+		
+		<script>
+		function enterReason(form, id) {
+		  var r = prompt("Nhập lý do hủy cho lịch hẹn #" + id + ":");
+		  if (r == null || r.trim() === "") {
+		    alert("Bạn phải nhập lý do!");
+		    return false; // chặn submit
+		  }
+		  form.reason.value = r;
+		  return true;
+		}
+		</script>
+      </c:if>
+    </td>
     </tr>
   </c:forEach>
+
 </table>

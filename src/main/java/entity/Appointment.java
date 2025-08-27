@@ -45,7 +45,7 @@ public class Appointment implements Serializable {
     private LocalTime endTime;
 
     @Column(name = "status", nullable = false, length = 20)
-    private String status = "BOOKED"; // BOOKED | CANCELLED | COMPLETED
+    private String status = "BOOKED"; // BOOKED | CANCELLED | COMPLETED | CONFIRMED
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -57,6 +57,15 @@ public class Appointment implements Serializable {
 
     @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Review review;
+    
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+
+    @Column(name = "canceled_by")
+    private Long canceledBy;
+
+    @Column(name = "canceled_at")
+    private LocalDateTime canceledAt;
 
     // Constructors
     public Appointment() {
@@ -92,4 +101,11 @@ public class Appointment implements Serializable {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public Review getReview() { return review; }
     public void setReview(Review review) { this.review = review; }
+    public String getCancelReason() { return cancelReason; }
+    public void setCancelReason(String cancelReason) { this.cancelReason = cancelReason; }
+    public Long getCanceledBy() { return canceledBy; }
+    public void setCanceledBy(Long canceledBy) { this.canceledBy = canceledBy; }
+    public LocalDateTime getCanceledAt() { return canceledAt; }
+    public void setCanceledAt(LocalDateTime canceledAt) { this.canceledAt = canceledAt; }
+
 }

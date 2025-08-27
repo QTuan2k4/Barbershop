@@ -94,4 +94,37 @@ public class AdminController {
     model.addAttribute("date", date);
     return "admin/appointment/list";
   }
+  
+	//======= Confirm =======
+	@PostMapping("/appointments/{id}/confirm")
+	public String confirmAppointment(@PathVariable Long id,
+	                                org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+	 boolean ok = appointmentService.confirm(id);
+	 ra.addFlashAttribute(ok ? "msg" : "error",
+	     ok ? ("Đã xác nhận lịch hẹn #" + id) : ("Không thể xác nhận lịch hẹn #" + id));
+	 return "redirect:/admin/appointments";
+	}
+	
+	//======= Cancel =======
+	@PostMapping("/appointments/{id}/cancel")
+	public String cancelAppointment(@PathVariable Long id,
+	                               @RequestParam(required = false) String reason,
+	                               @SessionAttribute(value = "userId", required = false) Long adminId,
+	                               org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+	 boolean ok = appointmentService.cancel(id, reason, adminId);
+	 ra.addFlashAttribute(ok ? "msg" : "error",
+	     ok ? ("Đã hủy lịch hẹn #" + id) : ("Không thể hủy lịch hẹn #" + id));
+	 return "redirect:/admin/appointments";
+	}
+	//======= COMPLETE========
+	@PostMapping("/appointments/{id}/complete")
+	public String completeAppointment(@PathVariable Long id,
+	                                  org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+	  boolean ok = appointmentService.complete(id);
+	  ra.addFlashAttribute(ok ? "msg" : "error",
+	      ok ? ("Đã đánh dấu hoàn thành lịch hẹn #" + id) : ("Không thể hoàn thành lịch hẹn #" + id));
+	  return "redirect:/admin/appointments";
+	}
+
+
 }

@@ -10,7 +10,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     @Override
     protected Class<?>[] getRootConfigClasses() {
         // Hibernate/DataSource/Transaction ở Root Context
-        return new Class<?>[]{HibernateConfig.class};
+        return new Class<?>[]{HibernateConfig.class, MailConfig.class};
     }
 
     @Override

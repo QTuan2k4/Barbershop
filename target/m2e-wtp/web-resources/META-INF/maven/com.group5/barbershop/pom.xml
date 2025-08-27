@@ -96,6 +96,28 @@
       <version>2.0.16</version>
       <scope>runtime</scope>
     </dependency>
+    
+	<!-- Spring Mail support (chứa JavaMailSender) -->
+	<dependency>
+	  <groupId>org.springframework</groupId>
+	  <artifactId>spring-context-support</artifactId>
+	  <version>${spring.version}</version>
+	</dependency>
+	
+	<!-- JavaMail API (javax.mail) -->
+	<dependency>
+	  <groupId>com.sun.mail</groupId>
+	  <artifactId>javax.mail</artifactId>
+	  <version>1.6.2</version>
+	</dependency>
+	
+	<!-- Activation API (cần cho Java 11) -->
+	<dependency>
+	  <groupId>com.sun.activation</groupId>
+	  <artifactId>javax.activation</artifactId>
+	  <version>1.2.0</version>
+	</dependency>
+
   </dependencies>
 
   <build>

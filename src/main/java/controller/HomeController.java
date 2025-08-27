@@ -18,6 +18,15 @@ public class HomeController {
         model.addAttribute("username", username);
         model.addAttribute("role", role);
 
-        return "home"; // /WEB-INF/views/home.jsp
+        return "home"; 
+    }
+    
+    // ✅ Trang hiển thị cửa hàng
+    @GetMapping("/store")
+    public String store(Model model) {
+        model.addAttribute("storeName", "Tuna Barbershop");
+        model.addAttribute("storeAddress", "138 Cần Vương, Nguyễn Văn Cừ, TP.Quy Nhơn");
+        model.addAttribute("storePhone", "09999999");
+        return "store/detail";  
     }
 }

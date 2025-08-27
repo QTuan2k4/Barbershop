@@ -8,4 +8,9 @@ import java.util.List;
 public interface AppointmentService {
     Appointment book(Long userId, Long serviceId, Long employeeId, LocalDate date, LocalTime startTime);
     List<Appointment> search(String status, Long employeeId, LocalDate date);
+ // ======= Confirm & Cancel =======
+    boolean confirm(Long id);
+    boolean cancel(Long id, String reason, Long canceledBy);
+    boolean complete(Long id);
+
 }

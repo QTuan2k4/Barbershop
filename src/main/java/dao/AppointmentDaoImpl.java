@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -114,4 +115,42 @@ public class AppointmentDaoImpl implements AppointmentDao {
         String jpql = "select count(a.appointmentId) from Appointment a";
         return em.createQuery(jpql, Long.class).getSingleResult();
     }
+    
+ // ======= APPEND ONLY: Confirm & Cancel =======
+    @Override
+    public java.util.Optional<Appointment> findById(Long id) {
+        return java.util.Optional.ofNullable(em.find(Appointment.class, id));
+    }
+
+    @Override
+    public int updateStatus(Long id, String newStatus) {
+        String jpql = "update Appointment a set a.status = :st where a.appointmentId = :id";
+        return em.createQuery(jpql)
+                 .setParameter("st", newStatus)
+                 .setParameter("id", id)
+                 .executeUpdate();
+    }
+    
+    @Override
+    public int cancel(Long id, Long canceledBy, String reason, LocalDateTime at) {
+        String jpql =
+            "update Appointment a set a.status = 'CANCELLED', " +
+            "a.cancelReason = :rs, a.canceledBy = :cb, a.canceledAt = :ca " +
+            "where a.appointmentId = :id";
+        return em.createQuery(jpql)
+                 .setParameter("rs", reason == null ? "" : reason.trim())
+                 .setParameter("cb", canceledBy)
+                 .setParameter("ca", at)
+                 .setParameter("id", id)
+                 .executeUpdate();
+    }
+    
+    @Override
+    public int complete(Long id) {
+        String jpql = "update Appointment a set a.status = 'COMPLETED' where a.appointmentId = :id";
+        return em.createQuery(jpql)
+                 .setParameter("id", id)
+                 .executeUpdate();
+    }
+
 }

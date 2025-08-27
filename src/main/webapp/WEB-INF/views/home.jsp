@@ -134,7 +134,7 @@
         <a href="${pageContext.request.contextPath}/appointments/new">Đặt lịch</a>
         <a href="${pageContext.request.contextPath}/price">Bảng giá</a>
         <a href="${pageContext.request.contextPath}/products">Sản phẩm</a>
-        <a href="${pageContext.request.contextPath}/salons">Tìm chi nhánh</a>
+        <a href="${pageContext.request.contextPath}/store" class="btn btn-primary">detail</a>
       </nav>
 
       <div class="user-menu">

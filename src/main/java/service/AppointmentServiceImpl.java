@@ -22,14 +22,15 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private static final LocalTime OPEN  = LocalTime.of(8, 0);
     private static final LocalTime CLOSE = LocalTime.of(21, 0);
-
+    private final MailService mailService;
     private final AppointmentDao dao;
 
     @PersistenceContext
     private EntityManager em;
 
-    public AppointmentServiceImpl(AppointmentDao dao) {
+    public AppointmentServiceImpl(AppointmentDao dao, MailService mailService) {
         this.dao = dao;
+        this.mailService = mailService;
     }
 
     @Override
@@ -83,4 +84,76 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         return a;
     }
+    // ======= APPEND ONLY: Confirm =======
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public boolean confirm(Long id) {
+        Appointment appt = dao.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lịch hẹn #" + id));
+
+        String st = appt.getStatus();
+        if ("CONFIRMED".equals(st)) return true;
+        if ("COMPLETED".equals(st) || "CANCELLED".equals(st)) return false;
+
+        boolean ok = dao.updateStatus(id, "CONFIRMED") > 0;
+
+        // ======= ĐÃ THÊM: gửi mail khi xác nhận =======
+        if (ok) {
+            mailService.send(
+                appt.getUser().getEmail(),
+                "Xác nhận lịch hẹn #" + id,
+                "Xin chào " + appt.getUser().getFullName()
+                + ",\nLịch hẹn của bạn ngày " + appt.getAppointmentDate()
+                + " lúc " + appt.getStartTime()
+                + " đã được xác nhận.\nHẹn gặp bạn tại Tuấn Barbershop!"
+            );
+        }
+
+        return ok;
+    }
+
+    // ======= APPEND ONLY: Cancel =======
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public boolean cancel(Long id, String reason, Long canceledBy) {
+        Appointment appt = dao.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lịch hẹn #" + id));
+
+        String st = appt.getStatus();
+        if ("CANCELLED".equals(st)) return true;
+        if ("COMPLETED".equals(st)) return false;
+
+        boolean ok = dao.cancel(id, canceledBy, reason, java.time.LocalDateTime.now()) > 0;
+
+        // ======= ĐÃ THÊM: gửi mail khi hủy =======
+        if (ok) {
+            mailService.send(
+                appt.getUser().getEmail(),
+                "Hủy lịch hẹn #" + id,
+                "Xin chào " + appt.getUser().getFullName()
+                + ",\nRất tiếc, lịch hẹn ngày " + appt.getAppointmentDate()
+                + " lúc " + appt.getStartTime()
+                + " đã bị hủy."
+                + (reason != null && !reason.isBlank() ? "\nLý do: " + reason : "")
+            );
+        }
+
+        return ok;
+    }
+    @Override
+    @Transactional
+    public boolean complete(Long id) {
+        Appointment appt = dao.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy lịch hẹn #" + id));
+
+        if ("CANCELLED".equals(appt.getStatus()) || "COMPLETED".equals(appt.getStatus())) {
+            return false;
+        }
+        // Chỉ cho complete khi đã CONFIRMED
+        if (!"CONFIRMED".equals(appt.getStatus())) {
+            return false;
+        }
+        return dao.complete(id) > 0;
+    }
+    
 }
