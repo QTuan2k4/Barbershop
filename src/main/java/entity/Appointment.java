@@ -5,6 +5,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Check;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -12,7 +13,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "appointment")
 @Check(constraints = "start_time < end_time")
-public class Appointment {
+public class Appointment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,6 +57,19 @@ public class Appointment {
 
     @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Review review;
+
+    // Constructors
+    public Appointment() {
+    }
+    public Appointment(User user, Employee employee, ServiceEntity service, LocalDate appointmentDate, LocalTime startTime, LocalTime endTime) {
+        this.user = user;
+        this.employee = employee;
+        this.service = service;
+        this.appointmentDate = appointmentDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.status = status;
+    }
 
     // getters/setters
     public Long getAppointmentId() { return appointmentId; }

@@ -1,8 +1,12 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:include page="_nav.jsp"/>
-<h2>Trang quản trị BarberShop</h2>
-<p>Chọn chức năng bên trên để quản lý.</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Quản Trị</title>
+</head>
+<body>
 <h1>Trang Quản Trị</h1>
 <hr/>
 
@@ -14,3 +18,6 @@
     <li><a href="<c:url value='/admin/statistics' />">Thống kê Lượt đặt lịch</a></li>
     <li><a href="<c:url value='/' />">Quay lại Trang chủ</a></li>
 </ul>
+
+</body>
+</html>
