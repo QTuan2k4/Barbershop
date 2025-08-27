@@ -106,6 +106,7 @@
   </style>
 </head>
 <body>
+<a href="${pageContext.request.contextPath}/">Về trang chủ</a>
 <div class="container">
   <h2>Đặt lịch cắt tóc</h2>
 
@@ -155,7 +156,7 @@
               <label class="svc-item" style="display:flex; align-items:center; gap:8px; padding:8px 10px;">
                 <input type="checkbox" name="serviceIds" value="${s.serviceId}">
                 <span style="font-weight:700; color:#0f172a;">${s.name}</span>
-                <span class="muted">30 phút)</span>
+                <span class="muted">${s.duration} phút)</span>
               </label>
             </c:forEach>
           </div>

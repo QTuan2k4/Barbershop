@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.io.Serializable;
 
 @Entity
 @Table(
@@ -15,7 +16,7 @@ import java.time.LocalTime;
         @UniqueConstraint(name = "uq_employee_email", columnNames = "email")
     }
 )
-public class Employee {
+public class Employee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,10 +26,10 @@ public class Employee {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 15)
+    @Column(name = "phone", nullable = false, unique = true, length = 15)
     private String phone;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
     @Column(name = "work_start_time", nullable = false)
@@ -44,6 +45,18 @@ public class Employee {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    // Constructors
+    public Employee() {
+    }
+
+    public Employee(String name, String phone, String email, LocalTime workStartTime, LocalTime workEndTime) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.workStartTime = workStartTime;
+        this.workEndTime = workEndTime;
+    }
 
     // getters/setters
     public Long getEmployeeId() { return employeeId; }
