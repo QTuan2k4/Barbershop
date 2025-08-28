@@ -139,6 +139,7 @@
 
       <div class="user-menu">
         <a class="btn btn--outline" href="${pageContext.request.contextPath}/login">Đăng nhập</a>
+        <a class="btn" href="${pageContext.request.contextPath}/appointments/my-appointments">Lịch hẹn của tôi</a>
         <a class="btn btn--primary" href="${pageContext.request.contextPath}/account">Quản lý tài khoản</a>
         <li><a href="${pageContext.request.contextPath}/logout">Đăng xuất</a></li>
       </div>

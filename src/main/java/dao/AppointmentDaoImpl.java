@@ -76,6 +76,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
             "and a.appointmentDate = :d " +
             "and a.status in ('BOOKED','COMPLETED') " +
             "and (:start < a.endTime and :end > a.startTime)";
+        
 
         Long cnt = em.createQuery(jpql, Long.class)
                      .setParameter("empId", employeeId)
@@ -113,5 +114,30 @@ public class AppointmentDaoImpl implements AppointmentDao {
     public Long countAllBookings() {
         String jpql = "select count(a.appointmentId) from Appointment a";
         return em.createQuery(jpql, Long.class).getSingleResult();
+    }
+    
+    //Bổ sung
+    @Override
+    public Appointment findById(Long appointmentId) {
+        return em.find(Appointment.class, appointmentId);
+    }
+
+    @Override
+    public List<Appointment> findByUserId(Long userId) {
+        String jpql = "select a from Appointment a " +
+                     "join fetch a.employee e " +
+                     "join fetch a.service sv " +
+                     "where a.user.userId = :userId " +
+                     "order by a.appointmentDate desc, a.startTime desc";
+        
+        return em.createQuery(jpql, Appointment.class)
+                 .setParameter("userId", userId)
+                 .getResultList();
+    }
+
+    @Override
+    @Transactional
+    public void update(Appointment appointment) {
+        em.merge(appointment);
     }
 }

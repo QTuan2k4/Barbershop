@@ -5,6 +5,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Check;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,6 +33,9 @@ public class Review {
     @Column(name = "comment")
     private String comment;
 
+    @Column(name = "review_date", nullable = false)
+    private LocalDate reviewDate = LocalDate.now();
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -49,6 +53,8 @@ public class Review {
     public void setRating(Integer rating) { this.rating = rating; }
     public String getComment() { return comment; }
     public void setComment(String comment) { this.comment = comment; }
+    public LocalDate getReviewDate() { return reviewDate; }
+    public void setReviewDate(LocalDate reviewDate) { this.reviewDate = reviewDate; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

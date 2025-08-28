@@ -21,5 +21,10 @@ public interface AppointmentDao {
     List<Object[]> countAppointmentsByService();
 
     Long countAllBookings();
+    
+  //Chức năng mới
+    Appointment findById(Long appointmentId);
+    List<Appointment> findByUserId(Long userId);
+    void update(Appointment appointment);
 }
 
