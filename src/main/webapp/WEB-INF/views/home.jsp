@@ -35,6 +35,7 @@
 	      <c:choose>
 	        <c:when test="${not empty username}">
 	          <span class="hello">Xin chào, <b><c:out value='${username}'/></b></span>
+	          <a class="btn btn--outline" href="${pageContext.request.contextPath}/customer/appointments">Lịch hẹn</a>
 	          <a class="btn btn--outline" href="${pageContext.request.contextPath}/account">Tài khoản</a>
 	          <a class="btn btn--primary" href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
 	        </c:when>
