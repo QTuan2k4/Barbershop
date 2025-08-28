@@ -1,0 +1,60 @@
+/* ===== THEME Navy (khớp toàn site) ===== */
+:root{
+  --primary:#0B2A4A;
+  --accent:#2563EB;
+  --bg:#F6F8FC;
+  --card:#FFFFFF;
+  --text:#0F172A;
+  --muted:#667085;
+  --ok:#16a34a;
+  --err:#dc2626;
+  --shadow:0 8px 28px rgba(0,0,0,.10);
+  --radius:12px;
+}
+
+/* ===== Base ===== */
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:Inter, Arial, Helvetica, sans-serif;
+}
+.container{ max-width:720px; margin:32px auto; padding:0 16px }
+.card{
+  background:var(--card); border:1px solid #e2e8f0; border-radius:var(--radius);
+  padding:16px 20px; margin-bottom:16px; box-shadow:var(--shadow);
+}
+.page-title{ margin:0 0 12px; color:var(--accent); font-weight:800; letter-spacing:.2px }
+.section-title{ margin:0 0 10px }
+
+/* ===== Alerts ===== */
+.alert{ padding:10px 12px; border-radius:10px; margin:10px 0; font-weight:600 }
+.alert--ok{ background:#ecfdf5; color:var(--ok); border:1px solid #bbf7d0 }
+.alert--err{ background:#fef2f2; color:var(--err); border:1px solid #fecaca }
+
+/* ===== Form rows ===== */
+.row{ display:grid; grid-template-columns:180px 1fr; gap:10px; margin:10px 0 }
+@media (max-width:560px){ .row{ grid-template-columns:1fr } }
+
+label{ font-weight:700; color:#1f2937 }
+input{
+  width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;
+  transition:border-color .2s, box-shadow .2s;
+}
+input:focus{
+  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(37,99,235,.18)
+}
+input.error{ border-color:var(--err)!important; box-shadow:0 0 0 3px rgba(220,38,38,.16)!important }
+
+.hint{ grid-column:2/-1; font-size:12px; color:var(--muted) }
+@media (max-width:560px){ .hint{ grid-column:1/-1 } }
+
+/* ===== Buttons ===== */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px; border-radius:10px; font-weight:600; cursor:pointer; border:1px solid #e5e7eb;
+  background:#fff; color:var(--text)
+}
+.btn:hover{ filter:brightness(.98) }
+.btn--primary{ background:var(--accent); color:#fff; border-color:var(--accent) }
+.btn--ghost{ background:#eef2ff; color:#0f172a; border-color:#c7d2fe }
+.actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }

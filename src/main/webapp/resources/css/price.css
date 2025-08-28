@@ -1,0 +1,56 @@
+/* Fallback biến nếu chưa load theme chung */
+:root{
+  --bg:#F6F8FC;
+  --text:#0F172A;
+  --muted:#667085;
+  --accent:#2563EB;   /* xanh navy tươi cho tiêu đề nếu cần */
+  --card:#FFFFFF;
+  --shadow:0 10px 28px rgba(0,0,0,.10);
+  --radius:18px;
+}
+
+/* Base */
+*{ box-sizing: border-box }
+html,body{ margin:0; padding:0 }
+body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.container{ max-width: 1100px; margin: 0 auto; padding: 0 16px }
+
+/* Title */
+.price-hero{ padding: 32px 0 10px }
+.title{
+  margin:0; text-align:center; text-transform:uppercase; letter-spacing:.6px;
+  font-weight: 900; line-height: 1.1;
+  font-size: clamp(24px, 4.6vw, 44px);
+  color: #122335; /* đậm, dễ đọc; có thể đổi sang var(--accent) nếu thích */
+}
+
+/* Image card */
+.price-image{ padding: 12px 0 36px }
+.price-card{
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid #e9edf5;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  /* Độ rộng hợp lý để ảnh không quá to trên màn lớn */
+  width: min(100%, 980px);
+}
+.price-card img{
+  display:block;
+  width:100%;
+  height:auto;         /* giữ đúng tỉ lệ ảnh */
+  object-fit: contain; /* tránh cắt ảnh bảng giá */
+}
+
+/* Responsive tinh chỉnh nhẹ */
+@media (max-width: 600px){
+  .price-hero{ padding-top: 22px }
+  .price-card{ border-radius: 14px }
+}
