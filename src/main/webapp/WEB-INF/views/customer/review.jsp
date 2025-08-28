@@ -35,6 +35,7 @@
             </div>
 
             <div class="review-container">
+                <!-- Thông tin lịch hẹn -->
                 <div class="appointment-summary">
                     <h3>Thông tin lịch hẹn #${appointment.appointmentId}</h3>
                     <div class="summary-grid">
@@ -48,16 +49,20 @@
                         </div>
                         <div class="summary-item">
                             <label>Ngày:</label>
-                            <span><fmt:formatDate value="${appointment.appointmentDate}" pattern="dd/MM/yyyy"/></span>
+                            <span><fmt:formatDate value="${appointmentDateFmt}" pattern="dd/MM/yyyy"/></span>
                         </div>
                         <div class="summary-item">
                             <label>Giờ:</label>
-                            <span><fmt:formatDate value="${appointment.startTime}" pattern="HH:mm"/> - 
-                                  <fmt:formatDate value="${appointment.endTime}" pattern="HH:mm"/></span>
+                            <span>
+                                <fmt:formatDate value="${startTimeFmt}" pattern="HH:mm"/>
+                                -
+                                <fmt:formatDate value="${endTimeFmt}" pattern="HH:mm"/>
+                            </span>
                         </div>
                     </div>
                 </div>
 
+                <!-- Form đánh giá -->
                 <div class="review-form-container">
                     <div class="review-form-card">
                         <h3><i class="fas fa-star"></i> Đánh giá của bạn</h3>

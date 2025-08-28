@@ -23,6 +23,7 @@
                 <a href="${pageContext.request.contextPath}/account" class="nav-link">Tài khoản</a>
                 <a href="${pageContext.request.contextPath}/customer/appointments" class="nav-link">Lịch hẹn</a>
                 <a href="${pageContext.request.contextPath}/logout" class="nav-link">Đăng xuất</a>
+                
             </nav>
         </header>
 
@@ -79,26 +80,26 @@
                             </div>
                         </div>
 
+                        <!-- Thời gian -->
                         <div class="detail-section">
                             <h3><i class="fas fa-calendar-alt"></i> Thời gian</h3>
                             <div class="detail-grid">
                                 <div class="detail-item">
                                     <label>Ngày:</label>
-                                    <span><fmt:formatDate value="${appointment.appointmentDate}" pattern="EEEE, dd/MM/yyyy"/></span>
+                                    <span>${appointmentDateFmt}</span>
                                 </div>
                                 <div class="detail-item">
                                     <label>Giờ:</label>
-                                    <span><fmt:formatDate value="${appointment.startTime}" pattern="HH:mm"/> - 
-                                          <fmt:formatDate value="${appointment.endTime}" pattern="HH:mm"/></span>
+                                    <span>${startTimeFmt} - ${endTimeFmt}</span>
                                 </div>
                                 <div class="detail-item">
                                     <label>Đặt lịch lúc:</label>
-                                    <span><fmt:formatDate value="${appointment.createdAt}" pattern="HH:mm dd/MM/yyyy"/></span>
+                                    <span>${createdAtFmt}</span>
                                 </div>
-                                <c:if test="${appointment.status == 'CANCELLED'}">
+                                <c:if test="${appointment.status == 'CANCELLED' && not empty canceledAtFmt}">
                                     <div class="detail-item">
                                         <label>Hủy lúc:</label>
-                                        <span><fmt:formatDate value="${appointment.canceledAt}" pattern="HH:mm dd/MM/yyyy"/></span>
+                                        <span>${canceledAtFmt}</span>
                                     </div>
                                 </c:if>
                             </div>
@@ -128,9 +129,12 @@
                                             <p>"${appointment.review.comment}"</p>
                                         </div>
                                     </c:if>
-                                    <div class="review-date">
-                                        Đánh giá lúc: <fmt:formatDate value="${appointment.review.createdAt}" pattern="HH:mm dd/MM/yyyy"/>
-                                    </div>
+									<div class="review-date">
+									    Đánh giá lúc:
+									    <c:if test="${not empty reviewCreatedAtFmt}">
+									        <fmt:formatDate value="${reviewCreatedAtFmt}" pattern="HH:mm dd/MM/yyyy"/>
+									    </c:if>
+									</div>
                                 </div>
                             </div>
                         </c:if>
