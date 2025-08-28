@@ -30,9 +30,9 @@ public class HibernateConfig {
     public DataSource dataSource() {
         HikariConfig cfg = new HikariConfig();
         cfg.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        cfg.setJdbcUrl("jdbc:mysql://localhost:3306/barbershop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh");
+        cfg.setJdbcUrl("jdbc:mysql://localhost:3307/barbershop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh");
         cfg.setUsername("root");
-        cfg.setPassword("123456"); // đổi mật khẩu
+        cfg.setPassword(""); // đổi mật khẩu
         cfg.setMaximumPoolSize(10);
         cfg.setPoolName("HikariDemoPool");
         return new HikariDataSource(cfg);
