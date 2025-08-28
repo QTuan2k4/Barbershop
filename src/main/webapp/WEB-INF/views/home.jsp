@@ -29,6 +29,8 @@
 	      <a href="${pageContext.request.contextPath}/appointments/new">Đặt lịch</a>
 	      <a href="<c:url value='/price'/>">Bảng giá</a>
 	      <a href="${pageContext.request.contextPath}/products">Sản phẩm</a>
+	      <!-- Nút chuyển sang trang cửa hàng -->
+		  <a href="${pageContext.request.contextPath}/store">Map</a>
 	    </nav>
 	
 	    <div class="user-menu">
